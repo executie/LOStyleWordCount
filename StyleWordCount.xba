@@ -4,7 +4,7 @@ Dim styles(0) As String
 Dim wordcounts(0) As long
 
 Sub StyleWordCount
-  Dim Doc As Object
+	Dim Doc As Object
 	Dim Enum As Object
 	Dim TextElement As Object
 	Dim paragraph As String

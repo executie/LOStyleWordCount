@@ -6,3 +6,4 @@ Does not include:
 	Headers and Footers
 	Bullet points (just the symbol)
 	Any other object
+	

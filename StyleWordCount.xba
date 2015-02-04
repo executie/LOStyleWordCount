@@ -53,7 +53,6 @@ Sub StyleWordCount
   		  		wordcounts(UBound(wordcounts)) = wordcount
   		  		'style = none
   		  		'wordcount = 0
-  				'Exit For
   			end if
      		next index
   	end if
@@ -61,7 +60,12 @@ Sub StyleWordCount
   Wend
   ' Display results
   ' TO DO:  proper gui
+  Dim mbText as String
+  Dim mbTotal as long
   for i = LBound(styles) to UBound(styles)
-    MsgBox str(i) + " : " + styles(i) + " : " + wordcounts(i)
+    mbText = mbText + styles(i) + " : " + wordcounts(i) + chr(13)
+    'MsgBox str(i) + " : " + styles(i) + " : " + wordcounts(i)
+    mbTotal = mbTotal + wordcounts(i)
   next i
+  MsgBox mbText + chr(13) + "Total : " + mbTotal
 End Sub

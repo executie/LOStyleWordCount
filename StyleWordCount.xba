@@ -1,0 +1,67 @@
+REM  *****  BASIC  *****
+
+Sub StyleWordCount
+  Dim Doc As Object
+  Dim Enum As Object
+  Dim TextElement As Object
+  Dim paragraph As String
+  Dim styles(0) As String
+  Dim wordcounts(0) As Integer
+  Dim style As String
+  Dim wordcount As Integer
+  
+  ' Create document object   
+  Doc = ThisComponent
+  ' Create enumeration object 
+  Enum = Doc.Text.createEnumeration
+  ' loop over all text elements
+  While Enum.hasMoreElements
+    TextElement = Enum.nextElement
+    
+    If TextElement.supportsService("com.sun.star.text.TextTable") Then
+      'MsgBox "The current block contains a table."
+      TextElement = Enum.nextElement
+    End If
+    
+    If TextElement.supportsService("com.sun.star.text.Paragraph") and TextElement.String <> none Then
+      'Get the style
+      style = TextElement.ParaStyleName
+      'TO DO:  replace 2 spaces with one
+      
+      'count the words in paragraph
+      Dim splitArray() As String
+      splitArray() = Split(TextElement.String)
+  	wordcount = UBound(splitArray()) + 1
+  	
+      'check style against array to see if it exists
+      if styles(0) = none and wordcounts(0) = none then
+  		styles(0) = style
+      	wordcounts(0) = wordcount
+      else
+      	for index = LBound(styles) to UBound(styles)
+  	    	if styles(index) = style then
+  	    		'if so, add word count to existing count
+  	    		wordcounts(index) = wordcounts(index) + wordcount
+  	    		'style = none
+  	    		'wordcount = 0
+  	    		Exit For
+  	    	elseif index = UBound(styles) then
+  	    		ReDim Preserve styles(UBound(styles)+1)
+  		 		ReDim Preserve wordcounts(UBound(wordcounts)+1)
+  		  		'if not, add style and word count to array
+  		  		styles(UBound(styles)) = style
+  		  		wordcounts(UBound(wordcounts)) = wordcount
+  		  		'style = none
+  		  		'wordcount = 0
+  				'Exit For
+  			end if
+     		next index
+  	end if
+    End If
+  Wend
+  ' Display results
+  ' TO DO:  proper gui
+  for i = LBound(styles) to UBound(styles)
+    MsgBox str(i) + " : " + styles(i) + " : " + wordcounts(i)
+  next i
+End Sub

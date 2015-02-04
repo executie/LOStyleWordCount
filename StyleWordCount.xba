@@ -7,38 +7,40 @@ Sub StyleWordCount
 	Dim Doc As Object
 	Dim Enum As Object
 	Dim TextElement As Object
-	Dim paragraph As String
-	
+
 	' Create document object   
 	Doc = ThisComponent
 	' Create enumeration object 
 	Enum = Doc.Text.createEnumeration
-	' Loop over all text elements
+	' loop over all text elements
 	While Enum.hasMoreElements
-    TextElement = Enum.nextElement
-    
-    If TextElement.supportsService("com.sun.star.text.TextTable") Then
-    	TextElement = Enum.nextElement
-    End If
-    
-    If TextElement.supportsService("com.sun.star.text.Paragraph") and TextElement.String <> none Then
-		countWords(TextElement)
-    End If
+		TextElement = Enum.nextElement
+
+		If TextElement.supportsService("com.sun.star.text.TextTable") Then
+	    	'MsgBox "The current block contains a table."
+			TextElement = Enum.nextElement
+		End If
+
+		If TextElement.supportsService("com.sun.star.text.Paragraph") and TextElement.String <> none Then
+			countWords(TextElement)
+		End If
 	Wend
 
 	displayResults
 End Sub
 
 Sub countWords(TextElement as Object)
+	Dim paragraph As String
 	Dim style As String
 	Dim wordcount As long
+	
+	' Get rid of leading and trailing spaces and replace 2 spaces with 1
+	paragraph = replace(Trim(TextElement.String), "  ", " ")
 	' Get the style
 	style = TextElement.ParaStyleName
-	' TO DO:  replace 2 spaces with one
-
 	' Count the words in paragraph
 	Dim splitArray() As String
-	splitArray() = Split(TextElement.String)
+	splitArray() = Split(paragraph)
 	wordcount = UBound(splitArray()) + 1
 
 	' Check style against array to see if it exists
@@ -47,29 +49,27 @@ Sub countWords(TextElement as Object)
 		wordcounts(0) = wordcount
 	else
 		for index = LBound(styles) to UBound(styles)
-			if styles(index) = style then
-				' if so, add word count to existing count
-				wordcounts(index) = wordcounts(index) + wordcount
-				Exit For
-			elseif index = UBound(styles) then
-				ReDim Preserve styles(UBound(styles)+1)
-				ReDim Preserve wordcounts(UBound(wordcounts)+1)
-				' if not, add style and word count to array
-				styles(UBound(styles)) = style
-				wordcounts(UBound(wordcounts)) = wordcount
+		   	if styles(index) = style then
+		   		'if so, add word count to existing count
+		   		wordcounts(index) = wordcounts(index) + wordcount
+		   		Exit For
+		   	elseif index = UBound(styles) then
+		   		ReDim Preserve styles(UBound(styles)+1)
+		 		ReDim Preserve wordcounts(UBound(wordcounts)+1)
+		  		'if not, add style and word count to array
+		  		styles(UBound(styles)) = style
+		  		wordcounts(UBound(wordcounts)) = wordcount
 			end if
-		next index
+	 	next index
 	end if
 End Sub
 
 Sub displayResults
 	Dim mbText as String
-	Dim mbTotal as long
-	
+    Dim mbTotal as long
 	for i = LBound(styles) to UBound(styles)
 		mbText = mbText + styles(i) + " : " + wordcounts(i) + chr(13)
 		mbTotal = mbTotal + wordcounts(i)
 	next i
-	
 	MsgBox mbText + chr(13) + "Total : " + mbTotal
 End Sub

@@ -18,11 +18,11 @@ Sub StyleWordCount
     TextElement = Enum.nextElement
     
     If TextElement.supportsService("com.sun.star.text.TextTable") Then
-      TextElement = Enum.nextElement
+    	TextElement = Enum.nextElement
     End If
     
     If TextElement.supportsService("com.sun.star.text.Paragraph") and TextElement.String <> none Then
-		  countWords(TextElement)
+		countWords(TextElement)
     End If
 	Wend
 
@@ -47,25 +47,25 @@ Sub countWords(TextElement as Object)
 		wordcounts(0) = wordcount
 	else
 		for index = LBound(styles) to UBound(styles)
-      if styles(index) = style then
-        ' if so, add word count to existing count
-        wordcounts(index) = wordcounts(index) + wordcount
-        Exit For
-      elseif index = UBound(styles) then
-        ReDim Preserve styles(UBound(styles)+1)
-        ReDim Preserve wordcounts(UBound(wordcounts)+1)
-        ' if not, add style and word count to array
-        styles(UBound(styles)) = style
-        wordcounts(UBound(wordcounts)) = wordcount
+			if styles(index) = style then
+				' if so, add word count to existing count
+				wordcounts(index) = wordcounts(index) + wordcount
+				Exit For
+			elseif index = UBound(styles) then
+				ReDim Preserve styles(UBound(styles)+1)
+				ReDim Preserve wordcounts(UBound(wordcounts)+1)
+				' if not, add style and word count to array
+				styles(UBound(styles)) = style
+				wordcounts(UBound(wordcounts)) = wordcount
 			end if
-    next index
+		next index
 	end if
 End Sub
 
 Sub displayResults
 	Dim mbText as String
-  Dim mbTotal as long
-  
+	Dim mbTotal as long
+	
 	for i = LBound(styles) to UBound(styles)
 		mbText = mbText + styles(i) + " : " + wordcounts(i) + chr(13)
 		mbTotal = mbTotal + wordcounts(i)

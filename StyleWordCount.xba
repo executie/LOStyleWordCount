@@ -110,5 +110,5 @@ Sub displayResults
 		mbText = mbText + styles(i) + " : " + wordcounts(i) + chr(13)
 		mbTotal = mbTotal + wordcounts(i)
 	next i
-	MsgBox mbText + chr(13) + "Total : " + mbTotal
+	MsgBox (mbText + chr(13) + "Total : " + mbTotal, 0, "Style Word Count")
 End Sub

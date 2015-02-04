@@ -22,23 +22,62 @@ Sub StyleWordCount
 		End If
 
 		If TextElement.supportsService("com.sun.star.text.Paragraph") and TextElement.String <> none Then
-			countWords(TextElement)
+			countWordsStandard(TextElement)
 		End If
 	Wend
 
+	' Deal with tables
+	Dim TextTables As Object
+	Dim Table As Object
+	TextTables = Doc.getTextTables()
+	For i = 0 To TextTables.getCount() - 1
+		Table = TextTables.getByIndex(i)
+		countWordsTable(Table)
+	Next i
+	
 	displayResults
 End Sub
 
-Sub countWords(TextElement as Object)
+Sub countWordsTable(Table As Object)
+	Dim Rows As Object
+	Dim RowIndex As Integer
+	Dim Cols As Object
+	Dim ColIndex As Integer
+	Dim CellName As String
+	Dim Cell As Object
+	Dim paragraph As String
+	Dim style As String
+	Dim wordcount As long
+	Rows = Table.getRows
+	Cols = Table.getColumns
+	For RowIndex = 1 To Rows.getCount()
+		For ColIndex = 1 To Cols.getCount()
+			CellName = Chr(Asc("A") - 1 + ColIndex) & RowIndex
+			Cell = Table.getCellByName(CellName)
+			' Get rid of leading and trailing spaces and replace 2 spaces with 1
+			paragraph = replace(Trim(Cell.String), "  ", " ")
+			' Get the style
+			style = Cell.createTextCursor().ParaStyleName
+			countWords(paragraph, style)
+		Next
+	Next
+End Sub
+
+Sub countWordsStandard(TextElement as Object)
 	Dim paragraph As String
 	Dim style As String
 	Dim wordcount As long
 	
 	' Get rid of leading and trailing spaces and replace 2 spaces with 1
-	paragraph = replace(Trim(TextElement.String), "  ", " ")
+	paragraph = replace(TextElement.String, "--", " ")
+	paragraph = replace(Trim(paragraph), "  ", " ")
 	' Get the style
 	style = TextElement.ParaStyleName
 	' Count the words in paragraph
+	countWords(paragraph, style)
+End Sub
+
+Sub countWords(paragraph As String, style As String)
 	Dim splitArray() As String
 	splitArray() = Split(paragraph)
 	wordcount = UBound(splitArray()) + 1

@@ -15,10 +15,10 @@ End Sub
 Sub StyleWordCount
 	Dim Enum As Object
 	Dim TextElement As Object
-	' Create document object  
-	Dim Doc As Object 
+	' Create document object
+	Dim Doc As Object
 	Doc = ThisComponent
-	' Create enumeration object 
+	' Create enumeration object
 	Enum = Doc.Text.createEnumeration
 	
 	waitDialog
@@ -28,22 +28,13 @@ Sub StyleWordCount
 		TextElement = Enum.nextElement
 		
 		If TextElement.supportsService("com.sun.star.text.TextTable") Then
-	    	'MsgBox "The current block contains a table."
+	    	countWordsTable(TextElement)
 		End If
 
 		If TextElement.supportsService("com.sun.star.text.Paragraph") Then
 			countWordsStandard(TextElement)
 		End If
 	Wend
-
-	' Deal with tables
-	Dim TextTables As Object
-	Dim Table As Object
-	TextTables = Doc.getTextTables()
-	For i = 0 To TextTables.getCount() - 1
-		Table = TextTables.getByIndex(i)
-		countWordsTable(Table)
-	Next i
 	
 	displayResults
 End Sub
@@ -133,10 +124,10 @@ End Sub
 
 Sub displayResults
 	Dim mbText as String
-	Dim mbTotal as long
-	
-	Dlg.dispose()
-	
+    Dim mbTotal as long
+    
+    Dlg.dispose()
+    
 	for i = LBound(styles) to UBound(styles)
 		mbText = mbText + styles(i) + " : " + wordcounts(i) + chr(13)
 		mbTotal = mbTotal + wordcounts(i)

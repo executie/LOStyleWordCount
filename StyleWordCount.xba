@@ -4,24 +4,22 @@ Dim styles(0) As String
 Dim wordcounts(0) As long
 
 Sub StyleWordCount
-	Dim Doc As Object
 	Dim Enum As Object
 	Dim TextElement As Object
-
-	' Create document object   
+	' Create document object  
+	Dim Doc As Object 
 	Doc = ThisComponent
 	' Create enumeration object 
 	Enum = Doc.Text.createEnumeration
-	' loop over all text elements
+	' Loop over all text elements
 	While Enum.hasMoreElements
 		TextElement = Enum.nextElement
-
+		
 		If TextElement.supportsService("com.sun.star.text.TextTable") Then
 	    	'MsgBox "The current block contains a table."
-			TextElement = Enum.nextElement
 		End If
 
-		If TextElement.supportsService("com.sun.star.text.Paragraph") and TextElement.String <> none Then
+		If TextElement.supportsService("com.sun.star.text.Paragraph") Then
 			countWordsStandard(TextElement)
 		End If
 	Wend
@@ -48,14 +46,15 @@ Sub countWordsTable(Table As Object)
 	Dim paragraph As String
 	Dim style As String
 	Dim wordcount As long
+	
 	Rows = Table.getRows
 	Cols = Table.getColumns
+	
 	For RowIndex = 1 To Rows.getCount()
 		For ColIndex = 1 To Cols.getCount()
 			CellName = Chr(Asc("A") - 1 + ColIndex) & RowIndex
 			Cell = Table.getCellByName(CellName)
-			' Get rid of leading and trailing spaces and replace 2 spaces with 1
-			paragraph = replace(Trim(Cell.String), "  ", " ")
+			paragraph = Trim(Cell.String)
 			' Get the style
 			style = Cell.createTextCursor().ParaStyleName
 			countWords(paragraph, style)
@@ -67,10 +66,8 @@ Sub countWordsStandard(TextElement as Object)
 	Dim paragraph As String
 	Dim style As String
 	Dim wordcount As long
-	
-	' Get rid of leading and trailing spaces and replace 2 spaces with 1
-	paragraph = replace(TextElement.String, "--", " ")
-	paragraph = replace(Trim(paragraph), "  ", " ")
+	' Don't know why, but test was off by 1 if not trimmed.
+	paragraph = Trim(TextElement.String)
 	' Get the style
 	style = TextElement.ParaStyleName
 	' Count the words in paragraph
@@ -78,10 +75,29 @@ Sub countWordsStandard(TextElement as Object)
 End Sub
 
 Sub countWords(paragraph As String, style As String)
-	Dim splitArray() As String
-	splitArray() = Split(paragraph)
-	wordcount = UBound(splitArray()) + 1
+	Dim brk as Object
+	Dim startpos as Long
+	Dim lc as new com.sun.star.lang.Locale
+	Dim lang as new com.sun.star.i18n.LanguageCountryInfo
+	Dim wordcount as Long
+	
+	brk = createUnoService("com.sun.star.i18n.BreakIterator")
+	nextwd = Boundary()
+	startpos = 0
+	lc.Language = lang.language
+	nextwd = brk.nextWord(paragraph, startpos, lc, 3)
+	wordcount = 0
+	
+	While startpos <> nextwd.endPos
+	    wordcount = wordcount + 1
+	    startpos = nextwd.startPos
+	    nextwd = brk.nextWord(paragraph, startpos, lc, 3)
+	wend
+	
+	tallyCount(wordcount, style)
+End Sub
 
+Sub tallyCount(wordcount As Long, style As String)
 	' Check style against array to see if it exists
 	if styles(0) = none and wordcounts(0) = none then
 		styles(0) = style
@@ -105,7 +121,7 @@ End Sub
 
 Sub displayResults
 	Dim mbText as String
-    Dim mbTotal as long
+	Dim mbTotal as long
 	for i = LBound(styles) to UBound(styles)
 		mbText = mbText + styles(i) + " : " + wordcounts(i) + chr(13)
 		mbTotal = mbTotal + wordcounts(i)

@@ -2,6 +2,15 @@ REM  *****  BASIC  *****
 
 Dim styles(0) As String
 Dim wordcounts(0) As long
+Dim Dlg As Object
+
+Sub waitDialog
+	DialogLibraries.LoadLibrary("Standard")
+	Dlg = CreateUnoDialog(DialogLibraries.Standard.Dialog1)
+	Dlg.Title = "Progress"
+	Dlg.getControl("Label1").Text = " wait for it... "
+	Dlg.setVisible(True)
+End Sub
 
 Sub StyleWordCount
 	Dim Enum As Object
@@ -11,6 +20,9 @@ Sub StyleWordCount
 	Doc = ThisComponent
 	' Create enumeration object 
 	Enum = Doc.Text.createEnumeration
+	
+	waitDialog
+	
 	' Loop over all text elements
 	While Enum.hasMoreElements
 		TextElement = Enum.nextElement
@@ -122,9 +134,13 @@ End Sub
 Sub displayResults
 	Dim mbText as String
 	Dim mbTotal as long
+	
+	Dlg.dispose()
+	
 	for i = LBound(styles) to UBound(styles)
 		mbText = mbText + styles(i) + " : " + wordcounts(i) + chr(13)
 		mbTotal = mbTotal + wordcounts(i)
 	next i
+	
 	MsgBox (mbText + chr(13) + "Total : " + mbTotal, 0, "Style Word Count")
 End Sub

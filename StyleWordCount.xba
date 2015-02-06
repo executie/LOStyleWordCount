@@ -28,7 +28,7 @@ Sub StyleWordCount
 		TextElement = Enum.nextElement
 		
 		If TextElement.supportsService("com.sun.star.text.TextTable") Then
-	    	countWordsTable(TextElement)
+			countWordsTable(TextElement)
 		End If
 
 		If TextElement.supportsService("com.sun.star.text.Paragraph") Then

@@ -56,11 +56,12 @@ Sub countWordsTable(Table As Object)
 	For RowIndex = 1 To Rows.getCount()
 		For ColIndex = 1 To Cols.getCount()
 			CellName = Chr(Asc("A") - 1 + ColIndex) & RowIndex
-			Cell = Table.getCellByName(CellName)
-			paragraph = Trim(Cell.String)
-			' Get the style
-			style = Cell.createTextCursor().ParaStyleName
-			countWords(paragraph, style)
+			On Error Resume Next
+				Cell = Table.getCellByName(CellName)
+				paragraph = Trim(Cell.String)
+				' Get the style
+				style = Cell.createTextCursor().ParaStyleName
+				countWords(paragraph, style)
 		Next
 	Next
 End Sub
@@ -92,9 +93,9 @@ Sub countWords(paragraph As String, style As String)
 	wordcount = 0
 	
 	While startpos <> nextwd.endPos
-	    wordcount = wordcount + 1
-	    startpos = nextwd.startPos
-	    nextwd = brk.nextWord(paragraph, startpos, lc, 3)
+		wordcount = wordcount + 1
+		startpos = nextwd.startPos
+		nextwd = brk.nextWord(paragraph, startpos, lc, 3)
 	wend
 	
 	tallyCount(wordcount, style)
@@ -106,29 +107,29 @@ Sub tallyCount(wordcount As Long, style As String)
 		styles(0) = style
 		wordcounts(0) = wordcount
 	else
-		for index = LBound(styles) to UBound(styles)
-		   	if styles(index) = style then
-		   		'if so, add word count to existing count
-		   		wordcounts(index) = wordcounts(index) + wordcount
-		   		Exit For
-		   	elseif index = UBound(styles) then
-		   		ReDim Preserve styles(UBound(styles)+1)
-		 		ReDim Preserve wordcounts(UBound(wordcounts)+1)
-		  		'if not, add style and word count to array
-		  		styles(UBound(styles)) = style
-		  		wordcounts(UBound(wordcounts)) = wordcount
+		for index = 0 to UBound(styles)
+			if styles(index) = style then
+				'if so, add word count to existing count
+				wordcounts(index) = wordcounts(index) + wordcount
+				Exit For
+			elseif index = UBound(styles) then
+				ReDim Preserve styles(UBound(styles)+1)
+				ReDim Preserve wordcounts(UBound(wordcounts)+1)
+				'if not, add style and word count to array
+				styles(UBound(styles)) = style
+				wordcounts(UBound(wordcounts)) = wordcount
 			end if
-	 	next index
+		next index
 	end if
 End Sub
 
 Sub displayResults
 	Dim mbText as String
-    Dim mbTotal as long
-    
-    Dlg.dispose()
-    
-	for i = LBound(styles) to UBound(styles)
+	Dim mbTotal as long
+	
+	Dlg.dispose()
+	
+	for i = 0 to UBound(styles)
 		mbText = mbText + styles(i) + " : " + wordcounts(i) + chr(13)
 		mbTotal = mbTotal + wordcounts(i)
 	next i

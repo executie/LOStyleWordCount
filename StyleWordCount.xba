@@ -40,29 +40,19 @@ Sub StyleWordCount
 End Sub
 
 Sub countWordsTable(Table As Object)
-	Dim Rows As Object
-	Dim RowIndex As Integer
-	Dim Cols As Object
-	Dim ColIndex As Integer
-	Dim CellName As String
+	Dim cellNames() As String
 	Dim Cell As Object
 	Dim paragraph As String
 	Dim style As String
 	Dim wordcount As long
-	
-	Rows = Table.getRows
-	Cols = Table.getColumns
-	
-	For RowIndex = 1 To Rows.getCount()
-		For ColIndex = 1 To Cols.getCount()
-			CellName = Chr(Asc("A") - 1 + ColIndex) & RowIndex
-			On Error Resume Next
-				Cell = Table.getCellByName(CellName)
-				paragraph = Trim(Cell.String)
-				' Get the style
-				style = Cell.createTextCursor().ParaStyleName
-				countWords(paragraph, style)
-		Next
+
+	cellNames = Table.getCellNames()
+	For i = LBound(cellNames()) To UBound(cellNames())
+		Cell = Table.getCellByName(cellNames(i))
+		paragraph = Trim(Cell.getString())
+		' Get the style
+		style = Cell.createTextCursor().ParaStyleName
+		countWords(paragraph, style)
 	Next
 End Sub
 
@@ -71,7 +61,7 @@ Sub countWordsStandard(TextElement as Object)
 	Dim style As String
 	Dim wordcount As long
 	' Don't know why, but test was off by 1 if not trimmed.
-	paragraph = Trim(TextElement.String)
+	paragraph = Trim(TextElement.getString())
 	' Get the style
 	style = TextElement.ParaStyleName
 	' Count the words in paragraph

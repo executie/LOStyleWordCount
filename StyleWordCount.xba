@@ -18,6 +18,12 @@ Sub StyleWordCount
 	' Create document object
 	Dim Doc As Object
 	Doc = ThisComponent
+	
+	If NOT Doc.supportsService("com.sun.star.text.TextDocument") Then
+		MsgBox "The current document is not a Writer text document", 48, "Error"
+		Exit Sub
+	End If
+	
 	' Create enumeration object
 	Enum = Doc.Text.createEnumeration
 	
@@ -35,6 +41,8 @@ Sub StyleWordCount
 			countWordsStandard(TextElement)
 		End If
 	Wend
+	
+	countWordsNotes(Doc)
 	
 	displayResults
 End Sub
@@ -66,6 +74,30 @@ Sub countWordsStandard(TextElement as Object)
 	style = TextElement.ParaStyleName
 	' Count the words in paragraph
 	countWords(paragraph, style)
+End Sub
+
+Sub countWordsNotes(Doc as Object)
+	Dim paragraph As String
+	Dim style As String
+	Dim footnotes() as Object
+	Dim footnote as Object
+	footnotes() = Doc.getFootnotes()
+	For i = 0 to footnotes.getCount() - 1
+		footnote = footnotes.getByIndex(i)
+		paragraph = footnote.getString()
+		style = footnote.createTextCursor().ParaStyleName
+		countWords(paragraph, style)
+	Next
+	
+	Dim endnotes() as Object
+	Dim endnote as Object
+	endnotes() = Doc.getEndnotes()
+	For i = 0 to endnotes.getCount() - 1
+		endnote = endnotes.getByIndex(i)
+		paragraph = endnote.getString()
+		style = endnote.createTextCursor().ParaStyleName
+		countWords(paragraph, style)
+	Next
 End Sub
 
 Sub countWords(paragraph As String, style As String)

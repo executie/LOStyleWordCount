@@ -70,7 +70,6 @@ Sub countWordsTable(Table As Object)
 	Dim Cell As Object
 	Dim paragraph As String
 	Dim style As String
-	Dim wordcount As long
 
 	cellNames = Table.getCellNames()
 	For i = LBound(cellNames()) To UBound(cellNames())
@@ -82,10 +81,9 @@ Sub countWordsTable(Table As Object)
 	Next
 End Sub
 
-Sub countWordsStandard(TextElement as Object)
+Sub countWordsStandard(TextElement As Object)
 	Dim paragraph As String
 	Dim style As String
-	Dim wordcount As long
 	' Don't know why, but test was off by 1 if not trimmed.
 	paragraph = Trim(TextElement.getString())
 	' Get the style
@@ -94,11 +92,11 @@ Sub countWordsStandard(TextElement as Object)
 	countWords(paragraph, style)
 End Sub
 
-Sub countWordsNotes(Doc as Object)
+Sub countWordsNotes(Doc As Object)
 	Dim paragraph As String
 	Dim style As String
-	Dim footnotes() as Object
-	Dim footnote as Object
+	Dim footnotes() As Object
+	Dim footnote As Object
 	footnotes() = Doc.getFootnotes()
 	For i = 0 to footnotes.getCount() - 1
 		footnote = footnotes.getByIndex(i)
@@ -107,8 +105,8 @@ Sub countWordsNotes(Doc as Object)
 		countWords(paragraph, style)
 	Next
 	
-	Dim endnotes() as Object
-	Dim endnote as Object
+	Dim endnotes() As Object
+	Dim endnote As Object
 	endnotes() = Doc.getEndnotes()
 	For i = 0 to endnotes.getCount() - 1
 		endnote = endnotes.getByIndex(i)
@@ -119,11 +117,11 @@ Sub countWordsNotes(Doc as Object)
 End Sub
 
 Sub countWords(paragraph As String, style As String)
-	Dim brk as Object
-	Dim startpos as Long
-	Dim lc as new com.sun.star.lang.Locale
-	Dim lang as new com.sun.star.i18n.LanguageCountryInfo
-	Dim wordcount as Long
+	Dim brk As Variant
+	Dim startpos As Long
+	Dim lc As New com.sun.star.lang.Locale
+	Dim lang As New com.sun.star.i18n.LanguageCountryInfo
+	Dim wordcount As Long
 	
 	brk = createUnoService("com.sun.star.i18n.BreakIterator")
 	nextwd = Boundary()
@@ -136,43 +134,43 @@ Sub countWords(paragraph As String, style As String)
 		wordcount = wordcount + 1
 		startpos = nextwd.startPos
 		nextwd = brk.nextWord(paragraph, startpos, lc, 3)
-	wend
+	Wend
 	
 	tallyCount(wordcount, style)
 End Sub
 
 Sub tallyCount(wordcount As Long, style As String)
 	' Check style against array to see if it exists
-	if styles(0) = none and wordcounts(0) = none then
+	If styles(0) = none and wordcounts(0) = none then
 		styles(0) = style
 		wordcounts(0) = wordcount
-	else
-		for index = 0 to UBound(styles)
-			if styles(index) = style then
+	Else
+		For index = 0 to UBound(styles)
+			If styles(index) = style then
 				'if so, add word count to existing count
 				wordcounts(index) = wordcounts(index) + wordcount
 				Exit For
-			elseif index = UBound(styles) then
+			Elseif index = UBound(styles) then
 				ReDim Preserve styles(UBound(styles)+1)
 				ReDim Preserve wordcounts(UBound(wordcounts)+1)
 				'if not, add style and word count to array
 				styles(UBound(styles)) = style
 				wordcounts(UBound(wordcounts)) = wordcount
-			end if
-		next index
-	end if
+			End if
+		Next index
+	End if
 End Sub
 
 Sub displayResults
-	Dim mbText as String
-	Dim mbTotal as long
+	Dim mbText As String
+	Dim mbTotal As long
 	
 	Dlg.dispose()
 	
-	for i = 0 to UBound(styles)
+	For i = 0 to UBound(styles)
 		mbText = mbText + styles(i) + " : " + wordcounts(i) + chr(13)
 		mbTotal = mbTotal + wordcounts(i)
-	next i
+	Next i
 	
 	MsgBox (mbText + chr(13) + "Total : " + mbTotal, 0, "Style Word Count")
 End Sub

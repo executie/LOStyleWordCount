@@ -24,7 +24,7 @@ Dim Dlg As Object
 
 Sub waitDialog
 	DialogLibraries.LoadLibrary("Standard")
-	Dlg = CreateUnoDialog(DialogLibraries.Standard.Dialog1)
+	Dlg = CreateUnoDialog(DialogLibraries.Standard.WaitDialog)
 	Dlg.Title = "Progress"
 	Dlg.getControl("Label1").Text = " wait for it... "
 	Dlg.setVisible(True)
@@ -121,10 +121,10 @@ Sub countWords(paragraph As String, style As String)
 	Dim startpos As Long
 	Dim lc As New com.sun.star.lang.Locale
 	Dim lang As New com.sun.star.i18n.LanguageCountryInfo
+	Dim nextwd As New com.sun.star.i18n.Boundary
 	Dim wordcount As Long
 	
 	brk = createUnoService("com.sun.star.i18n.BreakIterator")
-	nextwd = Boundary()
 	startpos = 0
 	lc.Language = lang.language
 	nextwd = brk.nextWord(paragraph, startpos, lc, 3)
@@ -141,24 +141,24 @@ End Sub
 
 Sub tallyCount(wordcount As Long, style As String)
 	' Check style against array to see if it exists
-	If styles(0) = none and wordcounts(0) = none then
+	If styles(0) = none and wordcounts(0) = none Then
 		styles(0) = style
 		wordcounts(0) = wordcount
 	Else
 		For index = 0 to UBound(styles)
-			If styles(index) = style then
+			If styles(index) = style Then
 				'if so, add word count to existing count
 				wordcounts(index) = wordcounts(index) + wordcount
 				Exit For
-			Elseif index = UBound(styles) then
+			Elseif index = UBound(styles) Then
 				ReDim Preserve styles(UBound(styles)+1)
 				ReDim Preserve wordcounts(UBound(wordcounts)+1)
 				'if not, add style and word count to array
 				styles(UBound(styles)) = style
 				wordcounts(UBound(wordcounts)) = wordcount
-			End if
+			End If
 		Next index
-	End if
+	End If
 End Sub
 
 Sub displayResults

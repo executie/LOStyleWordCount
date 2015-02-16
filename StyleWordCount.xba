@@ -103,17 +103,28 @@ Sub countWordsStandard(TextElement As Object)
 End Sub
 
 Sub countWordsNotes(Doc As Object)
-	Dim paragraph As String
-	Dim style As String
 	Dim footnotes() As Object
 	Dim footnote As Object
 	
 	footnotes() = Doc.getFootnotes()
 	For i = 0 to footnotes.getCount() - 1
 		footnote = footnotes.getByIndex(i)
-		paragraph = footnote.getString()
-		style = footnote.createTextCursor().ParaStyleName
-		countWords(paragraph, style)
+		
+		Dim EnumFoot As Object
+		Dim TextElementFoot As Object
+		
+		EnumFoot = footnote.Text.createEnumeration
+		While EnumFoot.hasMoreElements
+			TextElementFoot = Enumfoot.nextElement
+			
+			If TextElementFoot.supportsService("com.sun.star.text.TextTable") Then
+				countWordsTable(TextElementFoot)
+			End If
+			
+			If TextElementFoot.supportsService("com.sun.star.text.Paragraph") Then
+				countWordsStandard(TextElementFoot)
+			End If
+		Wend
 	Next
 	
 	Dim endnotes() As Object
@@ -122,9 +133,22 @@ Sub countWordsNotes(Doc As Object)
 	endnotes() = Doc.getEndnotes()
 	For i = 0 to endnotes.getCount() - 1
 		endnote = endnotes.getByIndex(i)
-		paragraph = endnote.getString()
-		style = endnote.createTextCursor().ParaStyleName
-		countWords(paragraph, style)
+		
+		Dim EnumEnd As Object
+		Dim TextElementEnd As Object
+		
+		EnumEnd = endnote.Text.createEnumeration
+		While EnumEnd.hasMoreElements
+			TextElementEnd = Enumend.nextElement
+			
+			If TextElementEnd.supportsService("com.sun.star.text.TextTable") Then
+				countWordsTable(TextElementEnd)
+			End If
+			
+			If TextElementEnd.supportsService("com.sun.star.text.Paragraph") Then
+				countWordsStandard(TextElementEnd)
+			End If
+		Wend
 	Next
 End Sub
 

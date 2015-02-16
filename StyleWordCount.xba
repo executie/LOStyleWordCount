@@ -68,16 +68,26 @@ End Sub
 Sub countWordsTable(Table As Object)
 	Dim cellNames() As String
 	Dim Cell As Object
-	Dim paragraph As String
-	Dim style As String
 
 	cellNames = Table.getCellNames()
-	For i = LBound(cellNames()) To UBound(cellNames())
+	For i = 0 To UBound(cellNames())
 		Cell = Table.getCellByName(cellNames(i))
-		paragraph = Trim(Cell.getString())
-		' Get the style
-		style = Cell.createTextCursor().ParaStyleName
-		countWords(paragraph, style)
+		
+		Dim Enum As Object
+		Dim TextElement As Object
+		
+		Enum = Cell.Text.createEnumeration
+		While Enum.hasMoreElements
+			TextElement = Enum.nextElement
+			
+			If TextElement.supportsService("com.sun.star.text.TextTable") Then
+				countWordsTable(TextElement)
+			End If
+	
+			If TextElement.supportsService("com.sun.star.text.Paragraph") Then
+				countWordsStandard(TextElement)
+			End If
+		Wend
 	Next
 End Sub
 
@@ -97,6 +107,7 @@ Sub countWordsNotes(Doc As Object)
 	Dim style As String
 	Dim footnotes() As Object
 	Dim footnote As Object
+	
 	footnotes() = Doc.getFootnotes()
 	For i = 0 to footnotes.getCount() - 1
 		footnote = footnotes.getByIndex(i)
@@ -107,6 +118,7 @@ Sub countWordsNotes(Doc As Object)
 	
 	Dim endnotes() As Object
 	Dim endnote As Object
+	
 	endnotes() = Doc.getEndnotes()
 	For i = 0 to endnotes.getCount() - 1
 		endnote = endnotes.getByIndex(i)
